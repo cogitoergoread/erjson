@@ -65,6 +65,18 @@ function csvsplit_buy () {
 }
 
 
+
+# Split file, 3rd Internal (INT)
+# Param1: Input file
+# Param2: Output file
+function csvsplit_int () {
+  check_files "$1" "$2"
+
+  # shellcheck disable=SC2016
+  # shellcheck disable=SC1010
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !("vásár." == $reference[-6:]) )'  then cut -f booking,ownerAccountNumber,amount,reference > "$2"
+}
+
 # do not run main when sourcing the script
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]
 then
