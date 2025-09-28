@@ -13,6 +13,11 @@ test_no_output_file() {
   assert_status_code 1  json2csv resources/premium-tosplit.json /cica
 }
 
+test_success_csv_tra() {
+  csvsplit_tra resources/premium-splitted.csv /tmp/out2.csv
+  assert "diff <(echo 'this is cool') /tmp/out2.csv"
+}
+
 setup_suite() {
-  source ../bin/jsonproc.sh
+  source ../bin/jsonproc.sh 
 }
