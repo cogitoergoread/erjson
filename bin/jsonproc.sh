@@ -53,6 +53,17 @@ function csvsplit_tra () {
   mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
 }
 
+# Split file, 2nd Buying (BUY)
+# Param1: Input file
+# Param2: Output file
+function csvsplit_buy () {
+  check_files "$1" "$2"
+
+  # shellcheck disable=SC2016
+  # shellcheck disable=SC1010
+  mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+}
+
 
 # do not run main when sourcing the script
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]

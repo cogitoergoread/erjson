@@ -15,7 +15,7 @@ test_no_output_file() {
 
 test_success_csv_tra() {
   csvsplit_tra resources/premium-splitted.csv /tmp/out2.csv
-  assert "diff <(echo 'this is cool') /tmp/out2.csv"
+  assert "diff  resources/premium-splitted-tra.csv /tmp/out2.csv"
 }
 
 setup_suite() {
