@@ -1,0 +1,4 @@
+test:
+  image: debian
+  script:
+    - FORCE_COLOR=true ./bash_unit tests/test_*

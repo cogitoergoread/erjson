@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+test_success_json_convert() {
+    json2csv resources/premium-tosplit.json /tmp/out.csv
+    assert "diff resources/premium-splitted.csv /tmp/out.csv"
+}
+
+test_no_input_file() {
+  assert_status_code 1  json2csv /cica /tmp/out.csv
+}
+
+test_no_output_file() {
+  assert_status_code 1  json2csv resources/premium-tosplit.json /cica
+}
+
+test_success_csv_tra() {
+  csvsplit_tra resources/premium-splitted.csv /tmp/out2.csv
+  assert "diff  resources/premium-splitted-tra.csv /tmp/out2.csv"
+}
+
+test_success_csv_buy() {
+  csvsplit_buy resources/premium-splitted.csv /tmp/out3.csv
+  assert "diff  resources/premium-splitted-buy.csv /tmp/out3.csv"
+}
+
+test_success_csv_int() {
+  csvsplit_int resources/premium-splitted.csv /tmp/out4.csv
+  assert "diff  resources/premium-splitted-int.csv /tmp/out4.csv"
+}
+
+test_success_csvsplit() {
+  csvsplit resources/premium-splitted.csv /tmp
+  assert "diff  resources/premium-splitted-tra.csv /tmp/premium-splitted_tra.csv"
+  assert "diff  resources/premium-splitted-buy.csv /tmp/premium-splitted_buy.csv"
+  assert "diff  resources/premium-splitted-int.csv /tmp/premium-splitted_int.csv"
+}
+
+setup_suite() {
+  source ../bin/jsonproc.sh 
+
+}
