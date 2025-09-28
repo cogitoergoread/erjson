@@ -18,6 +18,13 @@ test_success_csv_tra() {
   assert "diff  resources/premium-splitted-tra.csv /tmp/out2.csv"
 }
 
+test_success_csv_buy() {
+  csvsplit_buy resources/premium-splitted.csv /tmp/out3.csv
+  assert "diff  resources/premium-splitted-buy.csv /tmp/out3.csv"
+}
+
+
+
 setup_suite() {
   source ../bin/jsonproc.sh 
 }

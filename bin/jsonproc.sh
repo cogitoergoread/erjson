@@ -61,7 +61,7 @@ function csvsplit_buy () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ("vásár." == $reference[-6:])'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber > "$2"
 }
 
 
