@@ -77,6 +77,31 @@ function csvsplit_int () {
   mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !("vásár." == $reference[-6:]) )'  then cut -f booking,ownerAccountNumber,amount,reference > "$2"
 }
 
+# Split file, into 3 parts
+# Param1: Input file
+# Param2: Output directory
+function csvsplit () {
+      if [ ! -r "$1" ]
+    then
+      echo Can not read "$1"
+      exit 1
+    fi
+
+    if [ ! -w "$2" ]; then
+      echo Can not write to "$2"
+      exit 1
+    fi
+    # shellcheck disable=SC2155
+    local fname=$(basename "$1")
+    local of1=${fname%.csv}_tra.csv
+    local of2=${fname%.csv}_buy.csv
+    local of3=${fname%.csv}_int.csv
+
+    csvsplit_tra "$1" "${2}"/"${of1}"
+    csvsplit_buy "$1" "${2}"/"${of2}"
+    csvsplit_int "$1" "${2}"/"${of3}"
+}
+
 # do not run main when sourcing the script
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]
 then

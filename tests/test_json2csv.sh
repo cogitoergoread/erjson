@@ -28,6 +28,13 @@ test_success_csv_int() {
   assert "diff  resources/premium-splitted-int.csv /tmp/out4.csv"
 }
 
+test_success_csvsplit() {
+  csvsplit resources/premium-splitted.csv /tmp
+  assert "diff  resources/premium-splitted-tra.csv /tmp/premium-splitted_tra.csv"
+  assert "diff  resources/premium-splitted-buy.csv /tmp/premium-splitted_buy.csv"
+  assert "diff  resources/premium-splitted-int.csv /tmp/premium-splitted_int.csv"
+}
+
 setup_suite() {
   source ../bin/jsonproc.sh 
 
