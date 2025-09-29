@@ -1,0 +1,5 @@
+$booking = $booking[:10];
+
+$ownerAccountNumber == "11991119-94328510-00000000" {$account = "Assets:Erste:Pre"};
+
+$partner == "HU07117731400086902300000000" {$account2 = "Assets:OTP:Eva"};

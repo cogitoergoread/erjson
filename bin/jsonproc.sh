@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+display_help() {
+    echo "Usage: $0 {-h|j2c|csp}" >&2
+    echo
+    echo "   -h                       Display help"
+    echo "   j2c <infile> <outfile>   Convert JSON to CSV and clean data"
+    echo "   csp <infile> <outdir>    Write different CSV files to outdir by item type"
+    echo
+    exit 1
+}
+
 function main() {
     menu "$@" 
 }
@@ -9,7 +19,14 @@ function menu() {
         j2c) json2csv "$2" "$3"
         ;;
 
-        *) echo not implemented
+        csp) csvsplit"$2" "$3"
+        ;;
+
+        -h) display_help
+        ;;
+
+        *) echo $1 not implemented.
+           display_help
         ;;
     esac
 }
