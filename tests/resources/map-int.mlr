@@ -1,6 +1,6 @@
 $booking = $booking[:10];
-$narration = "Buy ".$cardNumber;
+$narration = "Bank költség";
 
 $ownerAccountNumber == "11991119-94328510-00000000" {$account = "Assets:Erste:Pre"};
 
-$partnerName =~ "TESCO" {$account2 = "Expenses:Élelmiszer:Áruház"};
+is_empty($reference) {$account2 = "Expenses:Bank:Erste"};

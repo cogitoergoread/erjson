@@ -4,7 +4,9 @@ display_help() {
     echo "Usage: $0 {-h|j2c|csp}" >&2
     echo
     echo "   -h                              Display help"
-    echo "   bgt <infile> <config> <outdir>  Convert CSV to beancount, TRA"
+    echo "   tra <infile> <config> <outdir>  Convert CSV to beancount, TRA"
+    echo "   buy <infile> <config> <outdir>  Convert CSV to beancount, BUY"
+    echo "   int <infile> <config> <outdir>  Convert CSV to beancount, INT"
     echo
     exit 1
 }
@@ -15,7 +17,13 @@ function main() {
 
 function menu() {
     case "$1" in
-        bgt) echo $1 not implemented. Yet.
+        tra) ctra_convert "$2" "$3" "$4"
+        ;;
+
+        buy) cbuy_convert "$2" "$3" "$4"
+        ;;
+
+        int) cint_convert "$2" "$3" "$4"
         ;;
 
         -h) display_help
@@ -83,6 +91,22 @@ function cbuy_convert {
 
     # shellcheck disable=SC1010
     mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
+    imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
+}
+
+# Convert BUY CSV to Beancount
+# Param1: Input file
+# Param2: Config file
+# Param3: Out Dir
+function cint_convert {
+    check_files "$1" "$2" "$3"
+    # shellcheck disable=SC2155
+    local fname=$(basename "$1")
+    local imcsv=${fname%.csv}_im.csv
+    local bcfil=${fname%.csv}.beancount
+
+    # shellcheck disable=SC1010
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 

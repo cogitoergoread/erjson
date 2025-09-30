@@ -11,6 +11,10 @@ test_success_json_convertbuy() {
     assert "diff resources/premium-splitted-buy_im.csv /tmp/premium-splitted-buy_im.csv"
 }
 
+test_success_json_convertint() {
+    ctra_convert resources/premium-splitted-int.csv resources/map-int.mlr /tmp/
+    assert "diff resources/premium-splitted-int_im.csv /tmp/premium-splitted-int_im.csv"
+}
 
 setup_suite() {
   source ../bin/beangen.sh
