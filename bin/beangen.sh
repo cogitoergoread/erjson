@@ -70,30 +70,20 @@ function ctra_convert {
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
-
-# Split file, into 3 parts
+# Convert BUY CSV to Beancount
 # Param1: Input file
-# Param2: Output directory
-function csvsplit () {
-      if [ ! -r "$1" ]
-    then
-      echo Can not read "$1"
-      exit 1
-    fi
-
-    if [ ! -w "$2" ]; then
-      echo Can not write to "$2"
-      exit 1
-    fi
+# Param2: Config file
+# Param3: Out Dir
+function cbuy_convert {
+    check_files "$1" "$2" "$3"
     # shellcheck disable=SC2155
     local fname=$(basename "$1")
-    local of1=${fname%.csv}_tra.csv
-    local of2=${fname%.csv}_buy.csv
-    local of3=${fname%.csv}_int.csv
+    local imcsv=${fname%.csv}_im.csv
+    local bcfil=${fname%.csv}.beancount
 
-    csvsplit_tra "$1" "${2}"/"${of1}"
-    csvsplit_buy "$1" "${2}"/"${of2}"
-    csvsplit_int "$1" "${2}"/"${of3}"
+    # shellcheck disable=SC1010
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
+    imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
 # do not run main when sourcing the script
