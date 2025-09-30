@@ -8,7 +8,7 @@ test_success_json_converttra() {
 
 test_success_json_convertbuy() {
     ctra_convert resources/premium-splitted-buy.csv resources/map-buy.mlr /tmp/
-    assert "diff resources/premium-splitted-tra_im.csv /tmp/premium-splitted-tra_im.csv"
+    assert "diff resources/premium-splitted-buy_im.csv /tmp/premium-splitted-buy_im.csv"
 }
 
 
