@@ -30,12 +30,19 @@ function menu() {
 function yeargen(){
     local script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     local config_dir="$1"/config
-    local wrk_dir="$1"/wrk
-    local input_dir="$1"/input
+    local wrk_dir="$1"
+    local input_dir="$1"
 
     # Clean
     rm -rf "$wrk_dir"/*
-    "$script_dir"/jsonproc.sh csp "$input_dir"/pre.json "$wrk_dir"
+    # JSON  -> CSV
+    "$script_dir"/jsonproc.sh j2c "$input_dir"/pre.json "$wrk_dir"/pre.csv
+    # CSV -> 3x CSV
+    "$script_dir"/jsonproc.sh csp "$wrk_dir"/pre.csv "$wrk_dir"
+    # 3x CSV -> 3x Beancount
+    "$script_dir"/beange.sh tra "$wrk_dir"/pre_tra.csv "$config_dir"/map-tra.mlr "$1"
+    "$script_dir"/beange.sh buy "$wrk_dir"/pre_buy.csv "$config_dir"/map-buy.mlr "$1"
+    "$script_dir"/beange.sh int "$wrk_dir"/pre_int.csv "$config_dir"/map-int.mlr "$1"
 }
 
 # do not run main when sourcing the script

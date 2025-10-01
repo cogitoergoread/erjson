@@ -30,9 +30,9 @@ test_success_csv_int() {
 
 test_success_csvsplit() {
   csvsplit resources/premium-splitted.csv /tmp
-  assert "diff  resources/premium-splitted-tra.csv /tmp/premium-splitted_tra.csv"
-  assert "diff  resources/premium-splitted-buy.csv /tmp/premium-splitted_buy.csv"
-  assert "diff  resources/premium-splitted-int.csv /tmp/premium-splitted_int.csv"
+  assert "diff  resources/premium-splitted-tra.csv /tmp/premium-splitted-tra.csv"
+  assert "diff  resources/premium-splitted-buy.csv /tmp/premium-splitted-buy.csv"
+  assert "diff  resources/premium-splitted-int.csv /tmp/premium-splitted-int.csv"
 }
 
 setup_suite() {

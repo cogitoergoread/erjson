@@ -19,7 +19,7 @@ function menu() {
         j2c) json2csv "$2" "$3"
         ;;
 
-        csp) csvsplit"$2" "$3"
+        csp) csvsplit "$2" "$3"
         ;;
 
         -h) display_help
@@ -110,9 +110,9 @@ function csvsplit () {
     fi
     # shellcheck disable=SC2155
     local fname=$(basename "$1")
-    local of1=${fname%.csv}_tra.csv
-    local of2=${fname%.csv}_buy.csv
-    local of3=${fname%.csv}_int.csv
+    local of1=${fname%.csv}-tra.csv
+    local of2=${fname%.csv}-buy.csv
+    local of3=${fname%.csv}-int.csv
 
     csvsplit_tra "$1" "${2}"/"${of1}"
     csvsplit_buy "$1" "${2}"/"${of2}"
