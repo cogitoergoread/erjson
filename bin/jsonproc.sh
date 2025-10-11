@@ -19,7 +19,7 @@ function menu() {
         j2c) json2csv "$2" "$3"
         ;;
 
-        csp) csvsplit"$2" "$3"
+        csp) csvsplit "$2" "$3"
         ;;
 
         -h) display_help
