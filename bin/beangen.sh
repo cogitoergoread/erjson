@@ -74,7 +74,7 @@ function ctra_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,senderReference,narration,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,senderReference,narration,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
@@ -90,7 +90,7 @@ function cbuy_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
@@ -106,7 +106,7 @@ function cint_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2 > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 

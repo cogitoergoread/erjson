@@ -1,2 +1,2 @@
-date,payee,narration,account,amount,account2
-2025-02-25,TESCO 41019 O:NKISZOLG,Buy 554533******8795,Assets:Erste:Pre,-487,Expenses:Élelmiszer:Áruház
+date,payee,narration,account,amount,account2,currency,xchgrate
+2025-02-25,TESCO 41019 O:NKISZOLG,Buy 554533******8795,Assets:Erste:Pre,-487,Expenses:Élelmiszer:Áruház,,

@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 
-test_success_json_converttra() {
+test_success_bean_converttra() {
     ctra_convert resources/premium-splitted-tra.csv resources/map-tra.mlr /tmp/
     assert "diff resources/premium-splitted-tra_im.csv /tmp/premium-splitted-tra_im.csv"
     assert "diff resources/premium-splitted-tra.beancount /tmp/premium-splitted-tra.beancount"
 }
 
-test_success_json_convertbuy() {
+test_success_bean_curr() {
+    ctra_convert resources/sample-curr-tra.csv resources/map-tra.mlr /tmp/
+    assert "diff resources/sample-curr-tra_im.csv /tmp/sample-curr-tra_im.csv"
+#    assert "diff resources/premium-splitted-tra.beancount /tmp/premium-splitted-tra.beancount"
+}
+
+test_success_bean_convertbuy() {
     ctra_convert resources/premium-splitted-buy.csv resources/map-buy.mlr /tmp/
     assert "diff resources/premium-splitted-buy_im.csv /tmp/premium-splitted-buy_im.csv"
 }
 
-test_success_json_convertint() {
+test_success_bean_convertint() {
     ctra_convert resources/premium-splitted-int.csv resources/map-int.mlr /tmp/
     assert "diff resources/premium-splitted-int_im.csv /tmp/premium-splitted-int_im.csv"
 }

@@ -1,5 +1,7 @@
 $booking = $booking[:10];
 $narration = "Buy ".$cardNumber;
+$currency = "";
+$xchgrate = "";
 
 $ownerAccountNumber == "11991119-94328510-00000000" {$account = "Assets:Erste:Pre"};
 
