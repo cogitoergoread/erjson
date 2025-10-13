@@ -1,5 +1,13 @@
 $booking = $booking[:10];
 
+# most of the transactions has no currency
+$currency = "";
+$xchgrate = "";
+
 $ownerAccountNumber == "11991119-94328510-00000000" {$account = "Assets:Erste:Pre"};
 
 $partner == "HU07117731400086902300000000" {$account2 = "Assets:OTP:Eva"};
+$partner == "HU54116000060000000081620771" {$account2 = "Assets:Erste:Eur"};
+
+
+$account2 == "Assets:Erste:Eur" {$currency = "EUR"; arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ",""); $xchgrate = 1/float(arfoly)};
