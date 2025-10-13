@@ -9,7 +9,7 @@ test_success_bean_converttra() {
 test_success_bean_curr() {
     ctra_convert resources/sample-curr-tra.csv resources/map-tra.mlr /tmp/
     assert "diff resources/sample-curr-tra_im.csv /tmp/sample-curr-tra_im.csv"
-#    assert "diff resources/premium-splitted-tra.beancount /tmp/premium-splitted-tra.beancount"
+    assert "diff resources/sample-curr-tra.beancount /tmp/sample-curr-tra.beancount"
 }
 
 test_success_bean_convertbuy() {

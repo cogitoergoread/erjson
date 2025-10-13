@@ -59,7 +59,13 @@ function check_files() {
 # Param2: Output file
 function imcsv_beancount {
   # shellcheck disable=SC2016
-  mlr --c2p --from "$1" put -q 'print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." HUF\n  ".$account2."\n"' > "$2"
+  mlr --c2p --from "$1" put -q '
+# Without currency
+is_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." HUF\n  ".$account2."\n"};
+
+# With currency
+is_not_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." HUF @ ".$xchgrate." ".$currency."\n  ".$account2."\n"};
+' > "$2"
 }
 
 # Convert TRA  CSV to Beancount
