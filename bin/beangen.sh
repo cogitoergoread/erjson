@@ -61,10 +61,10 @@ function imcsv_beancount {
   # shellcheck disable=SC2016
   mlr --c2p --from "$1" put -q '
 # Without currency
-is_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." HUF\n  ".$account2."\n"};
+is_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." ".$acccurr."\n  ".$account2."\n"};
 
 # With currency
-is_not_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." HUF @ ".$xchgrate." ".$currency."\n  ".$account2."\n"};
+is_not_empty($currency) {print $date." * \"".$payee."\" \"".$narration."\"\n  ".$account." ".$amount." ".$acccurr." @ ".$xchgrate." ".$currency."\n  ".$account2."\n"};
 ' > "$2"
 }
 
@@ -80,7 +80,7 @@ function ctra_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,senderReference,narration,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,senderReference,narration,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate,acccurr > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
@@ -96,7 +96,7 @@ function cbuy_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,partnerName,payee,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate,acccurr > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 
@@ -112,7 +112,7 @@ function cint_convert {
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate > "$3"/"$imcsv"
+    mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate,acccurr > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
 

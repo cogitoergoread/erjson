@@ -13,8 +13,8 @@ Sample BeanCount transaction:
 In order to build the BeanCount transaction, the following output CSV is essential:
 
 ```csv
-date,payee,narration,account,amount,account2,currency,xchgrate
-2023-01-05,"RUBIN INFORMATIKAI ZRT","Bér","Assets:Erste:Pre",601574,"Income:Rubin",,
+date,payee,narration,account,amount,account2,currency,xchgrate,acccurr
+2023-01-05,"RUBIN INFORMATIKAI ZRT","Bér","Assets:Erste:Pre",601574,"Income:Rubin",,,HUF
 ```
 
 Transaction with different currencies:
@@ -26,8 +26,8 @@ Transaction with different currencies:
 ```
 
 ```csv
-date,payee,narration,account,amount,account2,currency,xchgrate
-2025-09-15T00:00:00.000+0200,11991119-94328510-00000000,257842,KIDONL:5241830,Varga József,"ONLINE AZONNALI DEVIZAKONVERZIÓ, LAKOSSÁG, ELEKTRONIKUS, HUF ELLENI Árfolyam: 390.67 HUF/EUR",HU54116000060000000081620771,EUR,0.002559705122
+date,payee,narration,account,amount,account2,currency,xchgrate,acccurr
+2025-09-15T00:00:00.000+0200,11991119-94328510-00000000,257842,KIDONL:5241830,Varga József,"ONLINE AZONNALI DEVIZAKONVERZIÓ, LAKOSSÁG, ELEKTRONIKUS, HUF ELLENI Árfolyam: 390.67 HUF/EUR",HU54116000060000000081620771,EUR,0.002559705122,HUF
 ```
 
 ## Common part

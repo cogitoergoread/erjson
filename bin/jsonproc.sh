@@ -70,11 +70,11 @@ function csvsplit_tra () {
   then
     # shellcheck disable=SC2016
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+    mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference then sort -f booking > "$2"
   else
     # shellcheck disable=SC2016
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+    mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference then sort -f booking > "$2"
   fi
 }
 
@@ -86,7 +86,7 @@ function csvsplit_buy () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber then sort -f booking > "$2"
 }
 
 
@@ -99,7 +99,7 @@ function csvsplit_int () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -f booking,ownerAccountNumber,amount,reference > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -f booking,ownerAccountNumber,amount,reference then sort -f booking > "$2"
 }
 
 # Split file, into 3 parts

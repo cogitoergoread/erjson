@@ -1,5 +1,8 @@
 $booking = $booking[:10];
 
+# Account currency is HUF
+$acccurr = "HUF";
+
 # most of the transactions has no currency
 $currency = "";
 $xchgrate = "";

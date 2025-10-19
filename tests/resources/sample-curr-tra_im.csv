@@ -1,2 +1,2 @@
-date,payee,narration,account,amount,account2,currency,xchgrate
-2025-09-15,Varga József,KIDONL:5241830,Assets:Erste:Pre,257842,Assets:Erste:Eur,EUR,0.002559705121969949
+date,payee,narration,account,amount,account2,currency,xchgrate,acccurr
+2025-09-15,Varga József,KIDONL:5241830,Assets:Erste:Pre,257842,Assets:Erste:Eur,EUR,0.002559705121969949,HUF

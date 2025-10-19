@@ -1,3 +1,6 @@
+# Account currency is HUF
+$acccurr = "HUF";
+
 $booking = $booking[:10];
 $narration = "Bank költség";
 $currency = "";

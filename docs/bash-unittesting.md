@@ -17,3 +17,11 @@ This will install bash_unit in your current working directory:
 ```shell
 curl -s https://raw.githubusercontent.com/bash-unit/bash_unit/master/install.sh | bash
 ```
+
+## Rut tests
+
+In terminal:
+
+```shell
+./bash_unit tests/*.sh
+```
