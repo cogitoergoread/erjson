@@ -1,26 +1,35 @@
 #!/usr/bin/env bash
 
-test_success_bean_converttra() {
+# Premium account tests
+test_pre_bean_converttra() {
     ctra_convert resources/premium-splitted-tra.csv resources/map-tra.mlr /tmp/
     assert "diff resources/premium-splitted-tra_im.csv /tmp/premium-splitted-tra_im.csv"
     assert "diff resources/premium-splitted-tra.beancount /tmp/premium-splitted-tra.beancount"
 }
 
-test_success_bean_curr() {
+test_pre_bean_curr() {
     ctra_convert resources/sample-curr-tra.csv resources/map-tra.mlr /tmp/
     assert "diff resources/sample-curr-tra_im.csv /tmp/sample-curr-tra_im.csv"
     assert "diff resources/sample-curr-tra.beancount /tmp/sample-curr-tra.beancount"
 }
 
-test_success_bean_convertbuy() {
+test_pre_bean_convertbuy() {
     ctra_convert resources/premium-splitted-buy.csv resources/map-buy.mlr /tmp/
     assert "diff resources/premium-splitted-buy_im.csv /tmp/premium-splitted-buy_im.csv"
 }
 
-test_success_bean_convertint() {
+test_pre_bean_convertint() {
     ctra_convert resources/premium-splitted-int.csv resources/map-int.mlr /tmp/
     assert "diff resources/premium-splitted-int_im.csv /tmp/premium-splitted-int_im.csv"
 }
+
+# EUR Account tests
+test_eur_bean_converttra() {
+    ctra_convert resources/eursampl-tra.csv resources/meu-tra.mlr /tmp/
+    assert "diff resources/eursampl-tra_im.csv /tmp/eursampl-tra_im.csv"
+    assert "diff resources/eursampl-tra.beancount /tmp/eursampl-tra.beancount"
+}
+
 
 setup_suite() {
   source ../bin/beangen.sh

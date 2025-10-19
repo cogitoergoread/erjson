@@ -1,2 +1,2 @@
-date,payee,narration,account,amount,account2,currency,xchgrate
-2025-09-24,Éva OTP Varga,Éva kért pénzt,Assets:Erste:Pre,-100000,Assets:OTP:Eva,,
+date,payee,narration,account,amount,account2,currency,xchgrate,acccurr
+2025-09-24,Éva OTP Varga,Éva kért pénzt,Assets:Erste:Pre,-100000,Assets:OTP:Eva,,,HUF
