@@ -1,0 +1,17 @@
+$booking = $booking[:10];
+
+# Account currency is EUR
+$acccurr = "EUR";
+
+# most of the transactions has EUR currency
+$currency = "";
+$xchgrate = "";
+xchgint=400.69;
+
+
+$amount = $amount/100;
+
+$ownerAccountNumber == "11600006-00000000-81620771" {$account = "Assets:Erste:Eur"};
+$reference  =~ "Átvezetés befektetési" {$account2 = "Income:Megtakarítás"; $narration = "Befektetés"; $currency ="HUF"}; 
+
+$currency == "HUF" {$xchgrate = xchgint};

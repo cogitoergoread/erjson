@@ -1,0 +1,16 @@
+$booking = $booking[:10];
+
+# Account currency is EUR
+$acccurr = "EUR";
+
+# most of the transactions has EUR currency
+$currency ="HUF";
+xchgint=400.69;
+
+$amount = $amount/100;
+
+$ownerAccountNumber == "11600006-00000000-81620771" {$account = "Assets:Erste:Eur"};
+
+$partnerName =~ "NADRAZI" {$account2 = "Expenses:Élelmiszer:Kocsma"};
+
+$currency == "HUF" {$xchgrate = xchgint};
