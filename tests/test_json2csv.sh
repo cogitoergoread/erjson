@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-test_success_json_convert() {
+test_pre_success_json_convert() {
     json2csv resources/premium-tosplit.json /tmp/out.csv
     assert "diff resources/premium-splitted.csv /tmp/out.csv"
+}
+
+test_eur_success_json_convert() {
+    json2csv resources/eursampl.json /tmp/oute.csv
+    assert "diff resources/eursampl.csv /tmp/oute.csv"
 }
 
 test_no_input_file() {
