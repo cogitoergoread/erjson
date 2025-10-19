@@ -62,12 +62,20 @@ function json2csv {
 # Split file, first transfer transactions (TRA)
 # Param1: Input file
 # Param2: Output file
+# Param3: Filter out account
 function csvsplit_tra () {
   check_files "$1" "$2"
 
-  # shellcheck disable=SC2016
-  # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+  if [ $# -eq 2 ]
+  then
+    # shellcheck disable=SC2016
+    # shellcheck disable=SC1010
+    mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+  else
+    # shellcheck disable=SC2016
+    # shellcheck disable=SC1010
+    mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference > "$2"
+  fi
 }
 
 # Split file, 2nd Buying (BUY)
@@ -78,7 +86,7 @@ function csvsplit_buy () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ("vásár." == $reference[-6:])'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber > "$2"
 }
 
 
@@ -91,12 +99,13 @@ function csvsplit_int () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !("vásár." == $reference[-6:]) )'  then cut -f booking,ownerAccountNumber,amount,reference > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -f booking,ownerAccountNumber,amount,reference > "$2"
 }
 
 # Split file, into 3 parts
 # Param1: Input file
 # Param2: Output directory
+# Param3: Filter out account
 function csvsplit () {
       if [ ! -r "$1" ]
     then
@@ -114,7 +123,7 @@ function csvsplit () {
     local of2=${fname%.csv}_buy.csv
     local of3=${fname%.csv}_int.csv
 
-    csvsplit_tra "$1" "${2}"/"${of1}"
+    csvsplit_tra "$1" "${2}"/"${of1}" "$3"
     csvsplit_buy "$1" "${2}"/"${of2}"
     csvsplit_int "$1" "${2}"/"${of3}"
 }
