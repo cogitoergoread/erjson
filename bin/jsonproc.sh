@@ -16,10 +16,12 @@ function main() {
 
 function menu() {
     case "$1" in
-        j2c) json2csv "$2" "$3"
+        j2c)
+          local outfile=${2%.json}.csv
+          json2csv "$2" "$outfile"
         ;;
 
-        csp) csvsplit "$2" "$3"
+        csp) csvsplit "$2" $(dirname -- ${1})
         ;;
 
         -h) display_help
@@ -104,28 +106,26 @@ function csvsplit_int () {
 
 # Split file, into 3 parts
 # Param1: Input file
-# Param2: Output directory
-# Param3: Filter out account
 function csvsplit () {
-      if [ ! -r "$1" ]
+    if [ ! -r "$1" ]
     then
       echo Can not read "$1"
       exit 1
     fi
 
-    if [ ! -w "$2" ]; then
-      echo Can not write to "$2"
-      exit 1
+    # pre accouts has no filters
+    if [[ "$1" == pre* ]]; then
+      local filt=""
+    else
+      local filt="HU02119911199432851000000000"
     fi
-    # shellcheck disable=SC2155
-    local fname=$(basename "$1")
-    local of1=${fname%.csv}_tra.csv
-    local of2=${fname%.csv}_buy.csv
-    local of3=${fname%.csv}_int.csv
+    local of1=${1%.csv}.tra.csv
+    local of2=${1%.csv}.buy.csv
+    local of3=${1%.csv}.int.csv
 
-    csvsplit_tra "$1" "${2}"/"${of1}" "$3"
-    csvsplit_buy "$1" "${2}"/"${of2}"
-    csvsplit_int "$1" "${2}"/"${of3}"
+    csvsplit_tra "$1" "${of1}" "$filt"
+    csvsplit_buy "$1" "${of2}"
+    csvsplit_int "$1" "${of3}"
 }
 
 # do not run main when sourcing the script
