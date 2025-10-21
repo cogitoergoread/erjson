@@ -5,7 +5,7 @@ all: pre.beancount
 pre.beancount: pre.tra.beancount pre.buy.beancount pre.int.beancount
 	cat  $^ $@
 
-pre.tra.beancount: pre.tra.csv
+pre.tra.beancount: pre.tra.csv pre.tra.mlr
 	$(SCRIPTS)/beangen.sh bcg $^
 
 pre.buy.beancount: pre.buy.csv
