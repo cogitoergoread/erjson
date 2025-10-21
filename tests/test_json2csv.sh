@@ -72,6 +72,16 @@ test_04d_eur_success_csvsplit() {
   assert "diff  resources/eur.int.csv ${TEST_DIR}/eur.int.csv"
 }
 
+# Menu tests
+test_05a_pre_success_menu() {
+  cp resources/pre.json "$TEST_DIR"
+  menu j2s "$TEST_DIR"/pre.json
+  assert "diff  resources/pre.tra.csv ${TEST_DIR}/pre.tra.csv"
+  assert "diff  resources/pre.buy.csv ${TEST_DIR}/pre.buy.csv"
+  assert "diff  resources/pre.int.csv ${TEST_DIR}/pre.int.csv"
+}
+
+
 setup_suite() {
   # shellcheck source=../bin/jsonproc.sh 
   source ../bin/jsonproc.sh 

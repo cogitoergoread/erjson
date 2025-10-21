@@ -6,6 +6,7 @@ display_help() {
     echo "   -h                       Display help"
     echo "   j2c <infile> <outfile>   Convert JSON to CSV and clean data"
     echo "   csp <infile> <outdir>    Write different CSV files to outdir by item type"
+    echo "   j2s <infile>             Convert to CSV and split into the same directory"
     echo
     exit 1
 }
@@ -17,11 +18,25 @@ function main() {
 function menu() {
     case "$1" in
         j2c)
+          # JSON to CSV conversion
           local outfile=${2%.json}.csv
           json2csv "$2" "$outfile"
         ;;
 
-        csp) csvsplit "$2" $(dirname -- ${1})
+        csp)
+          # Split CSV files by transaction type
+          # shellcheck disable=SC2155
+          local basedir=$(dirname -- "${2}")
+          csvsplit "$2" "$basedir"
+        ;;
+
+        j2s)
+          # Convert to JSON and split in one step
+          local outfile=${2%.json}.csv
+          json2csv "$2" "$outfile"
+          # shellcheck disable=SC2155
+          local basedir=$(dirname -- "${2}")
+          csvsplit "$outfile" "$basedir"
         ;;
 
         -h) display_help

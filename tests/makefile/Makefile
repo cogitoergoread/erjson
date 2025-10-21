@@ -5,23 +5,16 @@ all: pre.beancount
 pre.beancount: pre.tra.beancount pre.buy.beancount pre.int.beancount
 	cat  $^ $@
 
-pre.tra.beancount: pre.tra.im
+pre.tra.beancount: pre.tra.csv
 	$(SCRIPTS)/beangen.sh bcg $^
 
-pre.tra.im: pre.tra.csv pre.tra.mlr
-	$(SCRIPTS)/beangen.sh imm $^
+pre.buy.beancount: pre.buy.csv
+	$(SCRIPTS)/beangen.sh bcg $^
 
-pre.buy.im: pre.buy.csv pre.buy.mlr
-	$(SCRIPTS)/beangen.sh imm $^
+pre.int.beancount: pre.int.csv
+	$(SCRIPTS)/beangen.sh bcg $^
 
-pre.int.im: pre.int.csv pre.int.mlr
-	$(SCRIPTS)/beangen.sh imm $^
-
-pre.tra.csv  pre.buy.csv pre.int.csv: pre.csv
-	$(SCRIPTS)/jsonproc.sh csp $^
-
-pre.csv: pre.json
-	$(SCRIPTS)/jsonproc.sh j2c $^ $@
-
+pre.tra.csv  pre.buy.csv pre.int.csv: pre.json
+	$(SCRIPTS)/jsonproc.sh j2s $^
 clean:
 	rm -f *.csv *.beancount *.im
