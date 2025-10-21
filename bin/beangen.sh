@@ -7,6 +7,7 @@ display_help() {
     echo "   tra <infile> <config> <outdir>  Convert CSV to beancount, TRA"
     echo "   buy <infile> <config> <outdir>  Convert CSV to beancount, BUY"
     echo "   int <infile> <config> <outdir>  Convert CSV to beancount, INT"
+    echo "   bcg <infile>                    Convert CSV to beancount any type"
     echo
     exit 1
 }
@@ -24,6 +25,9 @@ function menu() {
         ;;
 
         int) cint_convert "$2" "$3" "$4"
+        ;;
+
+        bcg) bcgen "$2"
         ;;
 
         -h) display_help
@@ -76,7 +80,7 @@ function ctra_convert {
     check_files "$1" "$2" "$3"
     # shellcheck disable=SC2155
     local fname=$(basename "$1")
-    local imcsv=${fname%.csv}_im.csv
+    local imcsv=${fname%.csv}.im
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
@@ -92,7 +96,7 @@ function cbuy_convert {
     check_files "$1" "$2" "$3"
     # shellcheck disable=SC2155
     local fname=$(basename "$1")
-    local imcsv=${fname%.csv}_im.csv
+    local imcsv=${fname%.csv}.im
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
@@ -108,13 +112,37 @@ function cint_convert {
     check_files "$1" "$2" "$3"
     # shellcheck disable=SC2155
     local fname=$(basename "$1")
-    local imcsv=${fname%.csv}_im.csv
+    local imcsv=${fname%.csv}.im
     local bcfil=${fname%.csv}.beancount
 
     # shellcheck disable=SC1010
     mlr -c --from "${1}" put -f "$2" then rename booking,date,amount.value,amount then cut -o -f date,payee,narration,account,amount,account2,currency,xchgrate,acccurr > "$3"/"$imcsv"
     imcsv_beancount "$3"/"$imcsv" "$3"/"$bcfil" 
 }
+
+# Convert any CSV to Beancount
+# Param1: Input file
+function bcgen {
+  local fname=$(basename "$1")
+  local acctplustyp=${fname%.csv}
+  local typ=${acctplustyp#*.}
+  # shellcheck disable=SC2155
+  local outdir=$(dirname -- "${1}")
+  local mlrname=${acctplustyp}.mlr
+
+  case $typ in
+    tra) ctra_convert "$1" "$outdir"/"$mlrname" "$outdir"
+    ;;
+    buy) cbuy_convert "$1" "$outdir"/"$mlrname" "$outdir"
+    ;;
+    int) cint_convert "$1" "$outdir"/"$mlrname" "$outdir"
+    ;;
+
+    *) echo $typ invalid file type
+    ;;
+  esac
+}
+
 
 # do not run main when sourcing the script
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]
