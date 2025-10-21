@@ -123,6 +123,7 @@ function cint_convert {
 # Convert any CSV to Beancount
 # Param1: Input file
 function bcgen {
+  # shellcheck disable=SC2155
   local fname=$(basename "$1")
   local acctplustyp=${fname%.csv}
   local typ=${acctplustyp#*.}
