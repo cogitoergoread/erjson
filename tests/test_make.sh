@@ -5,6 +5,7 @@ export TEST_DIR=/tmp/erjsonmk
 # Make tests
 test_01_pre_make() {
   cp resources/pre.json  resources/pre.*.mlr makefile/Makefile "$TEST_DIR"
+  export SCRIPTS="$(cd ../bin; pwd)"
   pushd "$TEST_DIR"
   make all
   popd

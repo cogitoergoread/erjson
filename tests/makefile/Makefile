@@ -1,4 +1,4 @@
-SCRIPTS := /usrdata/home/muszi/gwork/erjson/bin
+SCRIPTS ?= /tmp/cica
 
 all: pre.bean
 
