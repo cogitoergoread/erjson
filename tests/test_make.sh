@@ -9,9 +9,9 @@ test_01_pre_make() {
   make all
   popd
   
-  assert "diff  resources/pre.tra.csv ${TEST_DIR}/pre.tra.csv"
-  assert "diff  resources/pre.buy.csv ${TEST_DIR}/pre.buy.csv"
-  assert "diff  resources/pre.int.csv ${TEST_DIR}/pre.int.csv"
+  assert "diff  resources/pre.tra.im ${TEST_DIR}/pre.tra.im"
+  assert "diff  resources/pre.buy.im ${TEST_DIR}/pre.buy.im"
+  assert "diff  resources/pre.int.im ${TEST_DIR}/pre.int.im"
   assert "diff  resources/pre.bean ${TEST_DIR}/pre.bean"
 }
 
