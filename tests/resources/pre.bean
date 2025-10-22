@@ -1,0 +1,12 @@
+2025-09-24 * "Éva OTP Varga" "Éva kért pénzt"
+  Assets:Erste:Pre -100000 HUF
+  Assets:OTP:Eva
+
+2025-02-25 * "TESCO 41019 O:NKISZOLG" "Buy 554533******8795"
+  Assets:Erste:Pre -487 HUF
+  Expenses:Élelmiszer:Áruház
+
+2025-02-28 * "" "Bank költség"
+  Assets:Erste:Pre -1668 HUF
+  Expenses:Bank:Erste
+
