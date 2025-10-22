@@ -1,17 +1,17 @@
 SCRIPTS := /usrdata/home/muszi/gwork/erjson/bin
 
-all: pre.beancount
+all: pre.bean
 
-pre.beancount: pre.tra.beancount pre.buy.beancount pre.int.beancount
-	cat  $^ $@
+pre.bean: pre.tra.beancount pre.buy.beancount pre.int.beancount
+	cat  $^ > $@
 
 pre.tra.beancount: pre.tra.csv pre.tra.mlr
 	$(SCRIPTS)/beangen.sh bcg $^
 
-pre.buy.beancount: pre.buy.csv
+pre.buy.beancount: pre.buy.csv pre.buy.mlr
 	$(SCRIPTS)/beangen.sh bcg $^
 
-pre.int.beancount: pre.int.csv
+pre.int.beancount: pre.int.csv pre.int.mlr
 	$(SCRIPTS)/beangen.sh bcg $^
 
 pre.tra.csv  pre.buy.csv pre.int.csv: pre.json
