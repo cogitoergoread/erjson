@@ -5,7 +5,7 @@ display_help() {
     echo
     echo "   -h                       Display help"
     echo "   j2c <infile> <outfile>   Convert JSON to CSV and clean data"
-    echo "   csp <infile> <outdir>    Write different CSV files to outdir by item type"
+    echo "   csp <infile>             Write different CSV files splitted by type"
     echo "   j2s <infile>             Convert to CSV and split into the same directory"
     echo
     exit 1
@@ -129,18 +129,31 @@ function csvsplit () {
     fi
 
     # pre accouts has no filters
-    if [[ "$1" == pre* ]]; then
-      local filt=""
-    else
-      local filt="HU02119911199432851000000000"
-    fi
     local of1=${1%.csv}.tra.csv
     local of2=${1%.csv}.buy.csv
     local of3=${1%.csv}.int.csv
 
-    csvsplit_tra "$1" "${of1}" "$filt"
+    # pre accouts has no filters
+    local fname=$(basename "$1")
+    if [[ "$fname" == pre* ]]; then
+      csvsplit_tra "$1" "${of1}"
+    else
+      csvsplit_tra "$1" "${of1}" "HU02119911199432851000000000"
+    fi
     csvsplit_buy "$1" "${of2}"
     csvsplit_int "$1" "${of3}"
+
+    # Count file length, pre
+    if [[ "$fname" == pre* ]]; then
+      w1=$(wc -l "${of1}")
+      w2=$(wc -l "${of2}")
+      w3=$(wc -l "${of3}")
+      winfile=$(wc -l "${1}")
+      if [ $(( ${w1% *} + ${w2% *} + ${w3% *} - 3)) -ne $(( ${winfile% *} - 1 )) ]; then
+        echo input and outfile length not equal, infile: "$winfile" , Outfile: "$w1" , "$w2", "$w3"
+        exit 1
+      fi
+    fi
 }
 
 # do not run main when sourcing the script
