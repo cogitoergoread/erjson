@@ -77,3 +77,20 @@ Case:
 | Field                 | Example                                                                  |
 |-----------------------|--------------------------------------------------------------------------|
 | reference             | "5227738 VARGA JÓZSEF FRONT Átvezetés befektetési számlára."             |
+
+
+# Credit account
+
+ - Different from debit accounts
+ - Missing ownerAccountNumber, should be `HU02116000060000000049658752`
+ - Csoportos beszedés: `partnerAccount.number = "119911199432851000000000"` , reference, `categories[0]`
+ - Zárlati díj:  `partnerAccount.number ="", partnerAccount.iban = ""`, reference
+ - Kamat:  `partnerAccount.number ="", partnerAccount.iban = ""`, reference
+ - Átvezetés:  `partnerAccount.number = "119911199432851000000000", iban: "HU02119911199432851000000000"`, ref, cat
+ - Visszatérítés:  `partnerAccount.number ="", partnerAccount.iban = ""`, ref, cat
+
+## Processing
+
+ - `cre.tra.csv` always empty
+ - `cre.buy.csv` : `cardNumber == "428942******5024"`
+ - `cre.int.csv` : other records
