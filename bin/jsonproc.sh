@@ -76,6 +76,21 @@ function json2csv {
     | jq --raw-output '.[] | [ .booking, .ownerAccountNumber, .amount.value, .partnerAccount.iban, .partnerAccount.number , .senderReference, .partnerName, .reference, .cardNumber ] | @csv' >> "${2}"
 }
 
+# Credit account split to 2 (+ empty) csv files
+# Param1: Input file, csv
+# Param2: Output file, tra
+# Param3: Output file, buy
+# Param4: Output file, int
+function crecsv2split {
+  # Tra is empty
+  echo booking,ownerAccountNumber,amount,senderReference,partnerName,reference,partner > "$2"
+  # buy filter
+  mlr -c --from "$1" filter '$cardNumber == "428942******5024"' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber then sort -f booking > "$3"
+  # Int filter
+  mlr -c --from "$1" filter 'is_empty($cardNumber) && is_empty($partnerNumber )' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,reference then sort -f booking > "$4"
+}
+
+
 # Split file, first transfer transactions (TRA)
 # Param1: Input file
 # Param2: Output file
@@ -122,29 +137,26 @@ function csvsplit_int () {
 # Split file, into 3 parts
 # Param1: Input file
 function csvsplit () {
-    if [ ! -r "$1" ]
-    then
-      echo Can not read "$1"
-      exit 1
-    fi
+  if [ ! -r "$1" ]
+  then
+    echo Can not read "$1"
+    exit 1
+  fi
 
-    # pre accouts has no filters
-    local of1=${1%.csv}.tra.csv
-    local of2=${1%.csv}.buy.csv
-    local of3=${1%.csv}.int.csv
+  # pre accouts has no filters
+  local of1=${1%.csv}.tra.csv
+  local of2=${1%.csv}.buy.csv
+  local of3=${1%.csv}.int.csv
 
-    # pre accouts has no filters
-    local fname=$(basename "$1")
-    if [[ "$fname" == pre* ]]; then
+  # Different processes by file type
+  # shellcheck disable=SC2155
+  local fname=$(basename "$1")
+  local typ=${fname%.*}
+  case $typ in
+    pre) 
       csvsplit_tra "$1" "${of1}"
-    else
-      csvsplit_tra "$1" "${of1}" "HU02119911199432851000000000"
-    fi
-    csvsplit_buy "$1" "${of2}"
-    csvsplit_int "$1" "${of3}"
-
-    # Count file length, pre
-    if [[ "$fname" == pre* ]]; then
+      csvsplit_buy "$1" "${of2}"
+      csvsplit_int "$1" "${of3}"
       w1=$(wc -l "${of1}")
       w2=$(wc -l "${of2}")
       w3=$(wc -l "${of3}")
@@ -153,7 +165,19 @@ function csvsplit () {
         echo input and outfile length not equal, infile: "$winfile" , Outfile: "$w1" , "$w2", "$w3"
         exit 1
       fi
-    fi
+    ;;
+    eur)
+      csvsplit_tra "$1" "${of1}" "HU02119911199432851000000000"
+      csvsplit_buy "$1" "${of2}"
+      csvsplit_int "$1" "${of3}"
+    ;;
+    cre)
+      crecsv2split "$1" "${of1}" "${of2}" "${of3}"
+    ;;
+
+    *) echo $typ invalid file type
+    ;;
+  esac
 }
 
 # do not run main when sourcing the script

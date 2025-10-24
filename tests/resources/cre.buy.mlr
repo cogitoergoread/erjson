@@ -1,0 +1,10 @@
+# Account currency is HUF
+$acccurr = "HUF";
+$booking = $booking[:10];
+$narration = "Buy ".$cardNumber;
+$currency = "";
+$xchgrate = "";
+
+$account = "Liabilities:Erste:Visa";
+
+$partnerName =~ "MEHA'RI" {$account2 = "Expenses:Élelmiszer:Étterem"};

@@ -1,0 +1,11 @@
+# Account currency is HUF
+$acccurr = "HUF";
+
+$booking = $booking[:10];
+$narration = "Bank költség";
+$currency = "";
+$xchgrate = "";
+
+$account = "Liabilities:Erste:Visa";
+
+$account2 = "Income:KártyaJóváírás";

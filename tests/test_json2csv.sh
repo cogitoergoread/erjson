@@ -72,8 +72,23 @@ test_04d_eur_success_csvsplit() {
   assert "diff  resources/eur.int.csv ${TEST_DIR}/eur.int.csv"
 }
 
+# Credit tests
+test_05a_cre_success_json_convert() {
+    cp resources/cre.json "$TEST_DIR"
+    json2csv "$TEST_DIR"/cre.json "$TEST_DIR"/cre.csv
+    assert "diff resources/cre.csv ${TEST_DIR}/cre.csv"
+}
+
+test_05b_credit_split_success(){
+  crecsv2split resources/cre.csv ${TEST_DIR}/cre.tra.csv ${TEST_DIR}/cre.buy.csv ${TEST_DIR}/cre.int.csv
+  assert "diff  resources/cre.tra.csv ${TEST_DIR}/cre.tra.csv"
+  assert "diff  resources/cre.int.csv ${TEST_DIR}/cre.int.csv"
+  assert "diff  resources/cre.buy.csv ${TEST_DIR}/cre.buy.csv"
+}
+
+
 # Menu tests
-test_05a_pre_success_menu() {
+test_06a_pre_success_menu() {
   cp resources/pre.json "$TEST_DIR"
   menu j2s "$TEST_DIR"/pre.json
   assert "diff  resources/pre.tra.csv ${TEST_DIR}/pre.tra.csv"
@@ -81,6 +96,13 @@ test_05a_pre_success_menu() {
   assert "diff  resources/pre.int.csv ${TEST_DIR}/pre.int.csv"
 }
 
+test_06a_cre_success_menu() {
+  cp resources/cre.json "$TEST_DIR"
+  menu j2s "$TEST_DIR"/cre.json
+  assert "diff  resources/cre.tra.csv ${TEST_DIR}/cre.tra.csv"
+  assert "diff  resources/cre.buy.csv ${TEST_DIR}/cre.buy.csv"
+  assert "diff  resources/cre.int.csv ${TEST_DIR}/cre.int.csv"
+}
 
 setup_suite() {
   # shellcheck source=../bin/jsonproc.sh 
