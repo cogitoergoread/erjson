@@ -42,9 +42,26 @@ test_02c_eur_bean_convertint() {
     assert "diff resources/eur.int.im ${TEST_DIR}/eur.int.im"
 }
 
+# EUR Account tests
+test_03a_cre_bean_converttra() {
+    ctra_convert resources/cre.tra.csv resources/cre.tra.mlr "$TEST_DIR"
+    assert "diff resources/cre.tra.im ${TEST_DIR}/cre.tra.im"
+    assert "diff resources/cre.tra.beancount ${TEST_DIR}/cre.tra.beancount"
+}
+
+test_03b_cre_bean_convertbuy() {
+    ctra_convert resources/cre.buy.csv resources/cre.buy.mlr "$TEST_DIR"
+    assert "diff resources/cre.buy.im ${TEST_DIR}/cre.buy.im"
+}
+
+test_03c_cre_bean_convertint() {
+    ctra_convert resources/cre.int.csv resources/cre.int.mlr "$TEST_DIR"
+    assert "diff resources/cre.int.im ${TEST_DIR}/cre.int.im"
+}
+
 # Agnostic convert test (bcg)
-test_03_success_convert() {
-  for acct in pre eur
+test_04_success_convert() {
+  for acct in pre eur cre
   do
     cp resources/"$acct".*.csv resources/"$acct".*.mlr "$TEST_DIR"
     for ttyp in tra buy int
