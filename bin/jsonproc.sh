@@ -74,6 +74,24 @@ function json2csv {
     cat "${1}"\
     | tr -s ' ' \
     | jq --raw-output '.[] | [ .booking, .ownerAccountNumber, .amount.value, .partnerAccount.iban, .partnerAccount.number , .senderReference, .partnerName, .reference, .cardNumber ] | @csv' >> "${2}"
+
+    # EUR files should have exchgrate
+    # shellcheck disable=SC2155
+    local fname=$(basename "$1")
+    local typ=${fname%.*}
+    if [[ "$typ" == "eur" ]]
+    then
+      # shellcheck disable=SC2034
+      # shellcheck disable=SC2155
+      # shellcheck disable=SC2016
+      export startrate=$( mlr --c2p sort -r booking then put -q '($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")}; end {print @arfoly;}' $2)
+      # shellcheck disable=SC2016
+      mlr  -I --csv sort -f booking then put '
+        begin {@arfoly=ENV["startrate"];} 
+        ($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")};
+        $xchgrate = @arfoly;
+        ' $2
+    fi
 }
 
 # Credit account split to 2 (+ empty) csv files

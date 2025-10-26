@@ -30,6 +30,8 @@ date,payee,narration,account,amount,account2,currency,xchgrate,acccurr
 2025-09-15T00:00:00.000+0200,11991119-94328510-00000000,257842,KIDONL:5241830,Varga József,"ONLINE AZONNALI DEVIZAKONVERZIÓ, LAKOSSÁG, ELEKTRONIKUS, HUF ELLENI Árfolyam: 390.67 HUF/EUR",HU54116000060000000081620771,EUR,0.002559705122,HUF
 ```
 
+
+
 ## Common part
 
 Must have fields from the JSON structure:
@@ -41,6 +43,7 @@ Must have fields from the JSON structure:
 | amount.value       | -100000                        |
 | partnerName        | "Éva OTP Varga"                |
 | senderReference    | "Éva kért pénzt"               |
+|  xchgrate          | 360.97 eur                     |
 
 ## TRA: Account -> Account Transactions
 
