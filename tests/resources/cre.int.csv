@@ -1,2 +1,2 @@
-booking,ownerAccountNumber,amount,reference
-2025-01-13T00:00:00.000+0100,HU02116000060000000049658752,25000,Vásárlás visszatérítés
+booking,ownerAccountNumber,amount,reference,xchgrate
+2025-01-13T00:00:00.000+0100,HU02116000060000000049658752,25000,Vásárlás visszatérítés,

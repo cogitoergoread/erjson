@@ -74,6 +74,31 @@ function json2csv {
     cat "${1}"\
     | tr -s ' ' \
     | jq --raw-output '.[] | [ .booking, .ownerAccountNumber, .amount.value, .partnerAccount.iban, .partnerAccount.number , .senderReference, .partnerName, .reference, .cardNumber ] | @csv' >> "${2}"
+
+    # EUR files should have exchgrate
+    # shellcheck disable=SC2155
+    local fname=$(basename "$1")
+    local typ=${fname%.*}
+    if [[ "$typ" == "eur" ]]
+    then
+      # eur account has real exchange rates
+      # shellcheck disable=SC2034
+      # shellcheck disable=SC2155
+      # shellcheck disable=SC2016
+      # shellcheck disable=SC1010
+      export startrate=$( mlr --c2p sort -r booking then put -q '($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")}; end {print @arfoly;}' "$2")
+      # shellcheck disable=SC2016
+      # shellcheck disable=SC1010
+      mlr  -I --csv sort -f booking then put '
+        begin {@arfoly=ENV["startrate"];} 
+        ($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")};
+        $xchgrate = @arfoly;
+        ' "$2"
+    else  
+      # other accounts have empty exchange rate
+      # shellcheck disable=SC2016
+      mlr -I --csv put '$xchgrate = ""' "$2"
+    fi
 }
 
 # Credit account split to 2 (+ empty) csv files
@@ -85,9 +110,13 @@ function crecsv2split {
   # Tra is empty
   echo booking,ownerAccountNumber,amount,senderReference,partnerName,reference,partner > "$2"
   # buy filter
-  mlr -c --from "$1" filter '$cardNumber == "428942******5024"' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber then sort -f booking > "$3"
+  # shellcheck disable=SC2016
+  # shellcheck disable=SC1010
+  mlr -c --from "$1" filter '$cardNumber == "428942******5024"' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber,xchgrate then sort -f booking > "$3"
   # Int filter
-  mlr -c --from "$1" filter 'is_empty($cardNumber) && is_empty($partnerNumber )' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,reference then sort -f booking > "$4"
+  # shellcheck disable=SC2016
+  # shellcheck disable=SC1010
+  mlr -c --from "$1" filter 'is_empty($cardNumber) && is_empty($partnerNumber )' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,reference,xchgrate then sort -f booking > "$4"
 }
 
 
@@ -102,11 +131,11 @@ function csvsplit_tra () {
   then
     # shellcheck disable=SC2016
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference then sort -f booking > "$2"
+    mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -o -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference,xchgrate then sort -f booking > "$2"
   else
     # shellcheck disable=SC2016
     # shellcheck disable=SC1010
-    mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference then sort -f booking > "$2"
+    mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -o -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference,xchgrate then sort -f booking > "$2"
   fi
 }
 
@@ -118,7 +147,7 @@ function csvsplit_buy () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber then sort -f booking > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -o -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber,xchgrate then sort -f booking > "$2"
 }
 
 
@@ -131,7 +160,7 @@ function csvsplit_int () {
 
   # shellcheck disable=SC2016
   # shellcheck disable=SC1010
-  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -f booking,ownerAccountNumber,amount,reference then sort -f booking > "$2"
+  mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -o -f booking,ownerAccountNumber,amount,reference,xchgrate then sort -f booking > "$2"
 }
 
 # Split file, into 3 parts
@@ -175,7 +204,7 @@ function csvsplit () {
       crecsv2split "$1" "${of1}" "${of2}" "${of3}"
     ;;
 
-    *) echo $typ invalid file type
+    *) echo "$typ" invalid file type
     ;;
   esac
 }

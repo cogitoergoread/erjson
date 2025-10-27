@@ -1,2 +1,2 @@
-booking,ownerAccountNumber,amount,reference
-2025-02-28T00:00:00.000+0100,11991119-94328510-00000000,-1668,
+booking,ownerAccountNumber,amount,reference,xchgrate
+2025-02-28T00:00:00.000+0100,11991119-94328510-00000000,-1668,,
