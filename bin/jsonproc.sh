@@ -81,6 +81,8 @@ function json2csv {
     local typ=${fname%.*}
     if [[ "$typ" == "eur" ]]
     then
+      # eur account has real exchange rates
+       echo Type:$typ $2 Miller
       # shellcheck disable=SC2034
       # shellcheck disable=SC2155
       # shellcheck disable=SC2016
@@ -90,7 +92,12 @@ function json2csv {
         begin {@arfoly=ENV["startrate"];} 
         ($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")};
         $xchgrate = @arfoly;
-        ' $2
+        ' "$2"
+    else  
+      # other accounts have empty exchange rate
+      echo Type:$typ $2 Empty
+      # shellcheck disable=SC2016
+      mlr -I --csv put '$xchgrate = ""' "$2"
     fi
 }
 
