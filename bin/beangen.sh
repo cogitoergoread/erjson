@@ -38,6 +38,9 @@ function menu() {
         bcg) bcgen "$2"
         ;;
 
+        chk) chk_file "$2"
+        ;;
+
         -h) display_help
         ;;
 
@@ -152,6 +155,23 @@ function bcgen {
   esac
 }
 
+function chk_file {
+  # shellcheck disable=SC2155
+  local fname=$(basename "$1")
+  local acctplustyp=${fname%.csv}
+  local typ=${acctplustyp#*.}
+  case $typ in
+    tra) mlr --c2p --from "$1" uniq -f partner
+    ;;
+    buy) mlr --c2p --from "$1" uniq -f partnerName
+    ;;
+    int) mlr --c2p --from "$1" uniq -f reference
+    ;;
+
+    *) echo $typ invalid file type
+    ;;
+  esac
+}
 
 # do not run main when sourcing the script
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]
