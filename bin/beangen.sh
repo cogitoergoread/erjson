@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 display_help() {
-    echo "Usage: $0 {-h|j2c|csp}" >&2
+    echo "Usage: $0 {-h|-d|tra|buy|int|bcg}"
     echo
     echo "   -h                              Display help"
+    echo "   -d                              Debug Mode, echo commands"
     echo "   tra <infile> <config> <outdir>  Convert CSV to beancount, TRA"
     echo "   buy <infile> <config> <outdir>  Convert CSV to beancount, BUY"
     echo "   int <infile> <config> <outdir>  Convert CSV to beancount, INT"
@@ -17,6 +18,13 @@ function main() {
 }
 
 function menu() {
+  if [[ "$1" == "-d" ]]
+  then
+    echo Running in Debug mode
+    set -o xtrace
+    shift
+  fi
+
     case "$1" in
         tra) ctra_convert "$2" "$3" "$4"
         ;;

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 display_help() {
-    echo "Usage: $0 {-h|j2c|csp}" >&2
+    echo "Usage: $0 {-h|j2c|csp|j2s}"
     echo
     echo "   -h                       Display help"
     echo "   j2c <infile> <outfile>   Convert JSON to CSV and clean data"
@@ -16,6 +16,13 @@ function main() {
 }
 
 function menu() {
+  if [[ "$1" == "-d" ]]
+  then
+    echo Running in Debug mode
+    set -o xtrace
+    shift
+  fi
+
     case "$1" in
         j2c)
           # JSON to CSV conversion
