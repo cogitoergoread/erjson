@@ -3,10 +3,10 @@
 display_help() {
     echo "Usage: $0 {-h|j2c|csp|j2s}"
     echo
-    echo "   -h                       Display help"
-    echo "   j2c <infile> <outfile>   Convert JSON to CSV and clean data"
-    echo "   csp <infile>             Write different CSV files splitted by type"
-    echo "   j2s <infile>             Convert to CSV and split into the same directory"
+    echo "   -h                                  Display help"
+    echo "   j2c <infile> <outfile>  <xchgpath> Convert JSON to CSV and clean data"
+    echo "   csp <infile>                        Write different CSV files splitted by type"
+    echo "   j2s <infile> <xchgpath>             Convert to CSV and split into the same directory"
     echo
     exit 1
 }
@@ -27,7 +27,7 @@ function menu() {
         j2c)
           # JSON to CSV conversion
           local outfile=${2%.json}.csv
-          json2csv "$2" "$outfile"
+          json2csv "$2" "$outfile" "$3"
         ;;
 
         csp)
@@ -40,7 +40,7 @@ function menu() {
         j2s)
           # Convert to JSON and split in one step
           local outfile=${2%.json}.csv
-          json2csv "$2" "$outfile"
+          json2csv "$2" "$outfile" "$3"
           # shellcheck disable=SC2155
           local basedir=$(dirname -- "${2}")
           csvsplit "$outfile" "$basedir"
@@ -88,19 +88,15 @@ function json2csv {
     local typ=${fname%.*}
     if [[ "$typ" == "eur" ]]
     then
-      # eur account has real exchange rates
-      # shellcheck disable=SC2034
-      # shellcheck disable=SC2155
-      # shellcheck disable=SC2016
-      # shellcheck disable=SC1010
-      export startrate=$( mlr --c2p sort -r booking then put -q '($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")}; end {print @arfoly;}' "$2")
-      # shellcheck disable=SC2016
-      # shellcheck disable=SC1010
-      mlr  -I --csv sort -f booking then put '
-        begin {@arfoly=ENV["startrate"];} 
-        ($reference =~ "Árfolyam") { @arfoly = ssub(regextract($reference, "Árfolyam: [0-9]+(\.[0-9]*)"),"Árfolyam: ","")};
-        $xchgrate = @arfoly;
-        ' "$2"
+      # Check Schgrate file
+      local xchgfile="$3"/exchangerates.csv 
+      if [ ! -r "$xchgfile" ]
+      then
+        echo Can not read "$xchgfile" file for Exchange rates
+        exit 1
+      fi
+      # eur account has real exchange rates joined from file exchangerates.csv
+      mlr -I --csv cut -x -f xchgrate then put '$date=$booking[:10]' then join -f  "$xchgfile" -j date then rename -r EUR,xchgrate  then cut -o -f booking,ownerAccountNumber,amount,partneriban,partnerNumber,senderReference,partnerName,reference,cardNumber,xchgrate "$2"
     else  
       # other accounts have empty exchange rate
       # shellcheck disable=SC2016
