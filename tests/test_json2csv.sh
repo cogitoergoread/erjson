@@ -10,8 +10,8 @@ test_01a_pre_success_json_convert() {
 }
 
 test_01b_eur_success_json_convert() {
-    cp resources/eur.json "$TEST_DIR"
-    json2csv "$TEST_DIR"/eur.json "$TEST_DIR"/eur.csv
+    cp resources/eur.json "$TEST_DIR" 
+    json2csv "$TEST_DIR"/eur.json "$TEST_DIR"/eur.csv resources
     assert "diff resources/eur.csv ${TEST_DIR}/eur.csv"
 }
 
