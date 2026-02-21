@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 display_help() {
     echo "Usage: $0 {-h|j2c|csp|j2s}"
     echo
@@ -26,53 +28,63 @@ function menu() {
     case "$1" in
         j2c)
           # JSON to CSV conversion
-          local outfile=${2%.json}.csv
-          json2csv "$2" "$outfile" "$3"
+          local outfile="${2%.json}.csv"
+          json2csv "$2" "$outfile" "${3:-}"
         ;;
 
         csp)
           # Split CSV files by transaction type
-          # shellcheck disable=SC2155
-          local basedir=$(dirname -- "${2}")
+          local basedir
+          basedir=$(dirname -- "${2}")
           csvsplit "$2" "$basedir"
         ;;
 
         j2s)
           # Convert to JSON and split in one step
-          local outfile=${2%.json}.csv
-          json2csv "$2" "$outfile" "$3"
-          # shellcheck disable=SC2155
-          local basedir=$(dirname -- "${2}")
+          local outfile="${2%.json}.csv"
+          json2csv "$2" "$outfile" "${3:-}"
+          local basedir
+          basedir=$(dirname -- "${2}")
           csvsplit "$outfile" "$basedir"
         ;;
 
         -h) display_help
         ;;
 
-        *) echo $1 not implemented.
+        *) echo "'$1' not implemented" >&2
            display_help
         ;;
     esac
 }
 
+# Validate input file readability and output file writability
+# Arguments:
+#   $1 - Input file path to check for read access
+#   $2 - Output file path to check for write access
+# Exits:
+#   1 if validation fails
 function check_files() {
-    if [ ! -r "$1" ]
-    then
-      echo Can not read "$1"
+    if [[ ! -r "$1" ]]; then
+      echo "Error: Cannot read input file '$1'" >&2
       exit 1
     fi
 
-    if touch "$2"; then
+    if touch "$2" 2>/dev/null; then
       rm -f "$2"
     else
-      echo Can not create "$2"
+      echo "Error: Cannot create output file '$2'" >&2
       exit 1
     fi
 }
 
-# Convert Erste JSON to intermediate CSV
-# Param1: Input file
-# Param2: Output file
+# Convert Erste JSON bank statement to intermediate CSV format
+# Extracts transaction data and adds exchange rate column
+# Arguments:
+#   $1 - Input JSON file path
+#   $2 - Output CSV file path
+#   $3 - (Optional) Exchange rates directory path (required for EUR files)
+# Exits:
+#   1 if file validation or exchange rate lookup fails
 function json2csv {
     check_files "$1" "$2"
 
@@ -83,16 +95,14 @@ function json2csv {
     | jq --raw-output '.[] | [ .booking, .ownerAccountNumber, .amount.value, .partnerAccount.iban, .partnerAccount.number , .senderReference, .partnerName, .reference, .cardNumber ] | @csv' >> "${2}"
 
     # EUR files should have exchgrate
-    # shellcheck disable=SC2155
-    local fname=$(basename "$1")
+    local fname
+    fname=$(basename "$1")
     local typ=${fname%.*}
-    if [[ "$typ" == "eur" ]]
-    then
-      # Check Schgrate file
-      local xchgfile="$3"/exchangerates.csv 
-      if [ ! -r "$xchgfile" ]
-      then
-        echo Can not read "$xchgfile" file for Exchange rates
+    if [[ "$typ" == "eur" ]]; then
+      # Check exchange rate file
+      local xchgfile="$3"/exchangerates.csv
+      if [[ ! -r "$xchgfile" ]]; then
+        echo "Error: Cannot read exchange rate file '$xchgfile' (required for EUR transactions)" >&2
         exit 1
       fi
       # eur account has real exchange rates joined from file exchangerates.csv
@@ -104,74 +114,80 @@ function json2csv {
     fi
 }
 
-# Credit account split to 2 (+ empty) csv files
-# Param1: Input file, csv
-# Param2: Output file, tra
-# Param3: Output file, buy
-# Param4: Output file, int
+# Split credit card CSV into transaction types
+# Credit card transactions are categorized into TRA (empty), BUY, and INT types
+# Arguments:
+#   $1 - Input CSV file
+#   $2 - Output file for TRA (transfer) transactions
+#   $3 - Output file for BUY (purchase) transactions
+#   $4 - Output file for INT (internal) transactions
 function crecsv2split {
-  # Tra is empty
+  # TRA is empty for credit cards
   echo booking,ownerAccountNumber,amount,senderReference,partnerName,reference,partner > "$2"
-  # buy filter
+  # BUY filter
   # shellcheck disable=SC2016
-  # shellcheck disable=SC1010
   mlr -c --from "$1" filter '$cardNumber == "428942******5024"' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber,xchgrate then sort -f booking > "$3"
-  # Int filter
+  # INT filter
   # shellcheck disable=SC2016
-  # shellcheck disable=SC1010
   mlr -c --from "$1" filter 'is_empty($cardNumber) && is_empty($partnerNumber )' then put '$ownerAccountNumber = "HU02116000060000000049658752"' then cut -f booking,ownerAccountNumber,amount,reference,xchgrate then sort -f booking > "$4"
 }
 
 
-# Split file, first transfer transactions (TRA)
-# Param1: Input file
-# Param2: Output file
-# Param3: Filter out account
+# Extract transfer transactions (TRA) from CSV
+# Filters rows with partner IBAN or account number
+# Arguments:
+#   $1 - Input CSV file
+#   $2 - Output CSV file for transfer transactions
+#   $3 - (Optional) Partner IBAN to exclude from results
 function csvsplit_tra () {
   check_files "$1" "$2"
 
-  if [ $# -eq 2 ]
-  then
+  if [[ $# -eq 2 ]]; then
     # shellcheck disable=SC2016
-    # shellcheck disable=SC1010
     mlr -c --from "${1}" filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -o -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference,xchgrate then sort -f booking > "$2"
   else
     # shellcheck disable=SC2016
-    # shellcheck disable=SC1010
     mlr -c --from "${1}" filter "\$partneriban != \"${3}\"" then filter '(is_not_empty($partneriban)) || (is_not_empty($partnerNumber))' then put 'is_not_empty($partnerNumber) {$partner = $partnerNumber};' then put 'is_not_empty($partneriban) {$partner = $partneriban};' then cut -o -f booking,ownerAccountNumber,amount,partner,senderReference,partnerName,reference,xchgrate then sort -f booking > "$2"
   fi
 }
 
-# Split file, 2nd Buying (BUY)
-# Param1: Input file
-# Param2: Output file
+# Extract purchase transactions (BUY) from CSV
+# Filters rows with no partner info and reference containing "vásár."
+# Arguments:
+#   $1 - Input CSV file
+#   $2 - Output CSV file for purchase transactions
 function csvsplit_buy () {
   check_files "$1" "$2"
 
   # shellcheck disable=SC2016
-  # shellcheck disable=SC1010
   mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ($reference =~ "vásár.")'  then cut -o -f booking,ownerAccountNumber,amount,partner,partnerName,reference,cardNumber,xchgrate then sort -f booking > "$2"
 }
 
 
 
-# Split file, 3rd Internal (INT)
-# Param1: Input file
-# Param2: Output file
+# Extract internal transactions (INT) from CSV
+# Filters rows with no partner info and no purchase reference
+# Arguments:
+#   $1 - Input CSV file
+#   $2 - Output CSV file for internal transactions
 function csvsplit_int () {
   check_files "$1" "$2"
 
   # shellcheck disable=SC2016
-  # shellcheck disable=SC1010
   mlr -c --from "${1}" filter '(is_empty($partneriban)) && (is_empty($partnerNumber)) && ( (is_empty($reference)) || !($reference =~ "vásár.") )'  then cut -o -f booking,ownerAccountNumber,amount,reference,xchgrate then sort -f booking > "$2"
 }
 
-# Split file, into 3 parts
-# Param1: Input file
+# Split CSV file into three transaction type files (TRA, BUY, INT)
+# Handles different account types: pre (premium), eur (EUR account), cre (credit card)
+# Arguments:
+#   $1 - Input CSV file path
+# Outputs:
+#   Creates three files: <basename>.tra.csv, <basename>.buy.csv, <basename>.int.csv
+# Exits:
+#   1 if file unreadable or validation fails
 function csvsplit () {
-  if [ ! -r "$1" ]
-  then
-    echo Can not read "$1"
+  if [[ ! -r "$1" ]]; then
+    echo "Error: Cannot read input file '$1'" >&2
     exit 1
   fi
 
@@ -181,8 +197,8 @@ function csvsplit () {
   local of3=${1%.csv}.int.csv
 
   # Different processes by file type
-  # shellcheck disable=SC2155
-  local fname=$(basename "$1")
+  local fname
+  fname=$(basename "$1")
   local typ=${fname%.*}
   case $typ in
     pre) 
@@ -193,8 +209,10 @@ function csvsplit () {
       w2=$(wc -l "${of2}")
       w3=$(wc -l "${of3}")
       winfile=$(wc -l "${1}")
-      if [ $(( ${w1% *} + ${w2% *} + ${w3% *} - 3)) -ne $(( ${winfile% *} - 1 )) ]; then
-        echo input and outfile length not equal, infile: "$winfile" , Outfile: "$w1" , "$w2", "$w3"
+      local total_out=$(( ${w1% *} + ${w2% *} + ${w3% *} - 3 ))
+      local expected=$(( ${winfile% *} - 1 ))
+      if [[ $total_out -ne $expected ]]; then
+        echo "Error: Row count mismatch - Input: $expected, Output total: $total_out (TRA: ${w1% *}, BUY: ${w2% *}, INT: ${w3% *})" >&2
         exit 1
       fi
     ;;
@@ -207,7 +225,8 @@ function csvsplit () {
       crecsv2split "$1" "${of1}" "${of2}" "${of3}"
     ;;
 
-    *) echo "$typ" invalid file type
+    *) echo "Error: Invalid file type '$typ' (must be 'pre', 'eur', or 'cre')" >&2
+       exit 1
     ;;
   esac
 }
